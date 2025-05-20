@@ -1,1 +1,42 @@
+## Luis Carlos Benitez Medina
+## Juan Jose Garces Duran
+## Johan Martinez Salazar
+## Proyecto Calculo integral
+# Importamos librerias para arreglos matematicos
+import numpy as np
 
+# Datos hallados previamente
+tiempo = np.array([0, 10, 20, 30, 40])
+voltaje = np.array([3.6, 3.7, 3.8, 3.9, 4.0])
+corriente = np.array([0.5, 0.48, 0.46, 0.44, 0.42])
+
+# Corriente nominal es igual a 2 Amperios Hora, lo que equivale a 7200 Coulombs
+C_nominal = 2 * 3600  # 7200 C
+SOC_inicial = 0.2 # 20%
+
+# Formula de potencia
+potencia = voltaje * corriente
+
+# Integración por trapecio
+energia = np.trapezoid(potencia, tiempo)        # Joules
+energia_wh = energia / 3600                     # Wh
+carga = np.trapezoid(corriente, tiempo)         # Coulombs
+
+# Formula para calcular SOC
+SOC = SOC_inicial + (carga / C_nominal)
+SOC = min(SOC, 1.0) # 100%
+
+# Mostrar resultados
+print(f"\n--- Resultados de la simulación ---")
+print(f"Energía acumulada: {energia:.2f} J ({energia_wh:.5f} Wh)")
+print(f"Carga transferida: {carga:.2f} C")
+print(f"Estado de Carga (SOC): {SOC*100:.2f}%")
+
+# Análisis de fases CC y CV
+print("\nAnálisis de fases CC y CV:")
+if voltaje[-1] < 4.2 and corriente[-1] > 0.1:
+    print("Fase CC: Corriente constante, voltaje aumentando.")
+elif voltaje[-1] >= 4.2:
+    print("Fase CV: Voltaje constante (~4.2 V), corriente disminuyendo.")
+else:
+    print("Probablemente carga finalizada o corriente muy baja.")
